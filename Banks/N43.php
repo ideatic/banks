@@ -8,11 +8,21 @@ class Banks_N43
 {
     /**
      * Cuentas leídas del fichero
-     * @var array
+     * @var Banks_N43_Account[]
      */
-    public $accounts;
+    public $accounts = [];
 
-    protected $_current_account, $_current_entry, $_record_count;
+    /**
+     * @var Banks_N43_Account
+     */
+    protected $_current_account;
+
+    /**
+     * @var Banks_N43_Entry
+     */
+    protected $_current_entry;
+
+    protected $_record_count;
 
 
     /**
@@ -29,6 +39,8 @@ class Banks_N43
 
     public function parse($content)
     {
+        $content = utf8_encode($content);
+
         $this->_record_count = 0;
         foreach (explode("\n", $content) as $line) {
             if (!$line) {
@@ -41,20 +53,27 @@ class Banks_N43
             if (method_exists($this, $method_name)) {
                 $this->$method_name($line);
             } else {
-                throw new Banks_N43_Exception("Invalid record type '$code' in line {$this->_record_count}");
+                throw new Banks_N43_Exception("Invalid record type '{$code}' in line {$this->_record_count}");
             }
 
             $this->_record_count++;
         }
     }
 
+    /**
+     * Entrada 11 - Registro cabecera de cuenta (obligatorio)
+     *
+     * @param string $line
+     *
+     * @return Banks_N43_Account
+     */
     protected function _parse_record_11($line)
     {
-        //Entrada 11 - Registro cabecera de cuenta (obligatorio)
-        $account = [
+        $data = [
             'bank'            => substr($line, 2, 4),
             'office'          => substr($line, 6, 4),
             'account'         => substr($line, 10, 10),
+            'number'          => substr($line, 2, 18),
             'date_start'      => self::_parse_date(substr($line, 20, 6)),
             'date_end'        => self::_parse_date(substr($line, 26, 6)),
             'type'            => substr($line, 32, 1) == 1 ? self::TYPE_DEBIT : (substr($line, 32, 1) == 2 ? self::TYPE_CREDIT : self::TYPE_UNKNOWN),
@@ -65,8 +84,13 @@ class Banks_N43
             'entries'         => []
         ];
 
-        if ($account['type'] == self::TYPE_DEBIT) {
-            $account['balance_initial'] *= -1;
+        if ($data['type'] == self::TYPE_DEBIT) {
+            $data['balance_initial'] *= -1;
+        }
+
+        $account = new Banks_N43_Account();
+        foreach ($data as $k => $v) {
+            $account->$k = $v;
         }
 
         $this->_current_account = &$account;
@@ -75,54 +99,84 @@ class Banks_N43
         return $account;
     }
 
-
+    /**
+     * Entrada 22 - Registro principal de movimiento (obligatorio)
+     *
+     * @param string $line
+     *
+     * @return Banks_N43_Entry
+     */
     protected function _parse_record_22($line)
     {
-        //Entrada 22 - Registro principal de movimiento (obligatorio)
-        $entry = [
-            'office'         => substr($line, 6, 4),
+        $data = [
+            'office'         => ltrim(substr($line, 6, 4), '0'),
             'date'           => self::_parse_date(substr($line, 10, 6)),
+            'date_raw'       => substr($line, 10, 6),
             'date_value'     => self::_parse_date(substr($line, 16, 6)),
             'concept_common' => substr($line, 22, 2),
             'concept_own'    => substr($line, 24, 3),
             'type'           => substr($line, 27, 1) == 1 ? self::TYPE_DEBIT : (substr($line, 27, 1) == 2 ? self::TYPE_CREDIT : self::TYPE_UNKNOWN),
             'amount'         => floatval(substr($line, 28, 12) . '.' . substr($line, 40, 2)),
-            'document'       => substr($line, 42, 10),
+            'document'       => ltrim(substr($line, 42, 10), '0'),
             'refererence_1'  => ltrim(substr($line, 52, 12), '0'),
             'refererence_2'  => trim(substr($line, 64, 16)),
+            'raw'            => $line,
             'concepts'       => []
         ];
 
+        $entry = new Banks_N43_Entry();
+        foreach ($data as $k => $v) {
+            $entry->$k = $v;
+        }
+
         $this->_current_entry =& $entry;
-        $this->_current_account['entries'][] =& $entry;
+        $this->_current_account->entries[] =& $entry;
 
         return $entry;
     }
 
 
+    /**
+     * Entrada 23 - Registros complementarios de concepto (opcionales y hasta un máximo de 5)
+     *
+     * @param string $line
+     *
+     * @return Banks_N43_Entry
+     */
     protected function _parse_record_23($line)
     {
-        //Entrada 23 - Registros complementarios de concepto (opcionales y hasta un máximo de 5)
-        $this->_current_entry['concepts'][substr($line, 2, 2)] = trim(substr($line, 4));
+        $this->_current_entry->concepts[substr($line, 2, 2)] = trim(substr($line, 4));
 
         return $this->_current_entry;
     }
 
 
+    /**
+     * Entrada 24 - Registro complementario de información de equivalencia del importe (opcional y sin valor contable)
+     *
+     * @param string $line
+     *
+     * @return Banks_N43_Entry
+     */
     protected function _parse_record_24($line)
     {
-        //Entrada 24 - Registro complementario de información de equivalencia del importe (opcional y sin valor contable)
-        $this->_current_entry['currency_eq'] = Banks_Helper::currency_number2code(substr($line, 4, 3));
-        $this->_current_entry['amount_eq'] = floatval(substr($line, 7, 12) . '.' . substr($line, 19, 2));
+        $this->_current_entry->currency_eq = Banks_Helper::currency_number2code(substr($line, 4, 3));
+        $this->_current_entry->amount_eq = floatval(substr($line, 7, 12) . '.' . substr($line, 19, 2));
 
         return $this->_current_entry;
     }
 
 
+    /**
+     * Entrada 33 - Registro final de cuenta
+     *
+     * @param string $line
+     *
+     * @return Banks_N43_Account
+     */
     protected function _parse_record_33($line)
     {
-        //Entrada 33 - Registro final de cuenta
-        $this->_current_account['balance_end'] = floatval(substr($line, 59, 12) . '.' . substr($line, 71, 2));
+        $this->_current_account->balance_end = floatval(substr($line, 59, 12) . '.' . substr($line, 71, 2));
 
 
         /*Comprobaciones*/
@@ -170,24 +224,68 @@ class Banks_N43
         return $this->_current_account;
     }
 
+    /**
+     * Entrada 88 - Registro de fin de archivo
+     *
+     * @param string $line
+     *
+     * @throws Banks_N43_Exception
+     */
     protected function _parse_record_88($line)
     {
-        //Entrada 88 - Registro de fin de archivo
+        $record_count = substr($line, 20, 6);
 
-        if (substr($line, 20, 26) != $this->_record_count) {
-            throw new Banks_N43_Exception("Number of records doesn't match with the defined in the last record.");
+        if ($record_count != $this->_record_count) {
+            throw new Banks_N43_Exception("Number of records ({$this->_record_count}) doesn't match with the defined in the last record ({$record_count}).");
         }
-
-        return $this->_current_entry;
     }
 
     private static function _parse_date($date)
     {
-        return DateTime::createFromFormat('ymd', $date)->getTimestamp();
+        return DateTime::createFromFormat('ymd', $date)->setTime(0, 0, 0)->getTimestamp();
     }
 }
 
 class Banks_N43_Exception extends Exception
 {
 
+}
+
+/**
+ * @property int               $bank
+ * @property int               $office
+ * @property int               $account
+ * @property int               $number
+ * @property int               $date_start
+ * @property int               $date_end
+ * @property string            $type
+ * @property float             $balance_initial
+ * @property float             $balance_end
+ * @property string            $currency
+ * @property int               $mode
+ * @property string            $owner_name
+ * @property Banks_N43_Entry[] $entries
+ */
+class Banks_N43_Account
+{
+}
+
+
+/**
+ * @property int      $office
+ * @property int      $date     Fecha de la operación, en formato marca temporal UNIX
+ * @property string   $date_raw Fecha de la operación, en formato original
+ * @property int      $date_value
+ * @property string   $concept_common
+ * @property string   $concept_own
+ * @property string   $type     (debit or credit)
+ * @property float    $amount
+ * @property int      $document
+ * @property string   $refererence_1
+ * @property string   $refererence_2
+ * @property string   $raw      Registro completo sin procesar
+ * @property string[] $concepts
+ */
+class Banks_N43_Entry
+{
 }

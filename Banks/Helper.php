@@ -19,10 +19,11 @@ abstract class Banks_Helper
 
         return self::$_currencies[$code];
     }
+
     public static function currency_number2code($number)
     {
-        $code=array_search($number,self::$_currencies);
-        if($code===FALSE) {
+        $code = array_search($number, self::$_currencies);
+        if ($code === false) {
             throw new InvalidArgumentException("Unrecognized currency '$number'");
         }
 
