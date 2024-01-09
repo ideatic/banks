@@ -1,22 +1,27 @@
 {
-    "name": "ideatic/banks",
-    "description": "Tools for bank-related file handling (C43, SEPA, etc.)",
-    "keywords": ["banks", "sepa", "norma43"],
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Javier Marín",
-            "email": "contacto@ideatic.net",
-            "homepage": "http://www.ideatic.net/"
-        }
-    ],
-    "require": {
-        "php": ">=5.4"
-    },
-    "autoload": {
-        "psr-0": {
-            "Banks_": "/"
-        }
+  "name": "ideatic/banks",
+  "description": "Tools for bank-related file handling (C43, SEPA, etc.)",
+  "keywords": [
+    "banks",
+    "sepa",
+    "norma43"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Javier Marín",
+      "email": "contacto@ideatic.net",
+      "homepage": "http://www.ideatic.net/"
     }
+  ],
+  "require": {
+    "php": ">=8",
+    "ext-mbstring": "*"
+  },
+  "autoload": {
+    "psr-0": {
+      "Banks_": "/"
+    }
+  }
 }

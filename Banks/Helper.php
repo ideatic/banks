@@ -2,7 +2,7 @@
 
 abstract class Banks_Helper
 {
-    private static $_currencies = [
+    private static array $_currencies = [
         'EUR' => 978,
         'USD' => 840,
         'GBP' => 426,
@@ -10,7 +10,7 @@ abstract class Banks_Helper
         'CNY' => 156,
     ];
 
-    public static function currency_code2number($code)
+  public static function currency_code2number(string $code): int
     {
         $currency_name = strtoupper($code);
         if (!isset(self::$_currencies[$currency_name])) {
@@ -20,7 +20,7 @@ abstract class Banks_Helper
         return self::$_currencies[$code];
     }
 
-    public static function currency_number2code($number)
+  public static function currency_number2code(int $number): string
     {
         $code = array_search($number, self::$_currencies);
         if ($code === false) {
