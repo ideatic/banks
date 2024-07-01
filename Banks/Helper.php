@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 abstract class Banks_Helper
 {
@@ -10,7 +11,7 @@ abstract class Banks_Helper
         'CNY' => 156,
     ];
 
-  public static function currency_code2number(string $code): int
+    public static function currency_code2number(string $code): int
     {
         $currency_name = strtoupper($code);
         if (!isset(self::$_currencies[$currency_name])) {
@@ -20,7 +21,7 @@ abstract class Banks_Helper
         return self::$_currencies[$code];
     }
 
-  public static function currency_number2code(int $number): string
+    public static function currency_number2code(int $number): string
     {
         $code = array_search($number, self::$_currencies);
         if ($code === false) {
