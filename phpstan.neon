@@ -1,0 +1,19 @@
+parameters:
+  level: 6
+  paths:
+      - ./
+  parallel:
+    processTimeout: 300.0
+  reportUnmatchedIgnoredErrors: false
+  reportWrongPhpDocTypeInVarTag: false
+  tipsOfTheDay: true
+  treatPhpDocTypesAsCertain: false
+  polluteScopeWithLoopInitialAssignments: false
+  polluteScopeWithAlwaysIterableForeach: false
+  checkDynamicProperties: %featureToggles.bleedingEdge%
+  checkExplicitMixedMissingReturn: true
+  checkFunctionNameCase: true
+  checkInternalClassCaseSensitivity: true
+  reportMaybesInMethodSignatures: true
+  reportStaticMethodSignatures: true
+  reportMaybesInPropertyPhpDocTypes: true

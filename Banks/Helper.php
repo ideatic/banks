@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 abstract class Banks_Helper
 {
+    /** @var array<string, int> */
     private static array $_currencies = [
         'EUR' => 978,
         'USD' => 840,

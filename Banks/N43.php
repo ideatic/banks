@@ -71,11 +71,14 @@ class Banks_N43
             'type' => substr($line, 32, 1) == 1 ? self::TYPE_DEBIT : (substr($line, 32, 1) == 2 ? self::TYPE_CREDIT : self::TYPE_UNKNOWN),
             'balance_initial' => floatval(substr($line, 33, 12) . '.' . substr($line, 45, 2)),
             'currency' => Banks_Helper::currency_number2code(intval(substr($line, 47, 3))),
-            'mode' => substr($line, 50, 1),// 1, 2 o 3
+            'mode' => intval(substr($line, 50, 1)),// 1, 2 o 3
             'owner_name' => trim(substr($line, 51, 26)),
-            'entries' => []
+            'entries' => [],
         ];
-        $data['IBAN'] = self::_cccToIBAN('ES', $data['bank'] . $data['office'] . self::_calculateCccDigit($data['bank'], $data['office'], $data['account']) . $data['account']);
+        $data['IBAN'] = self::_cccToIBAN(
+            'ES',
+            $data['bank'] . $data['office'] . self::_calculateCccDigit($data['bank'], $data['office'], $data['account']) . $data['account']
+        );
 
         if ($data['type'] == self::TYPE_DEBIT) {
             $data['balance_initial'] *= -1;
@@ -92,18 +95,18 @@ class Banks_N43
         return $account;
     }
 
-    private static function _calculateCccDigit(string $entidad, string $oficina, string $cuenta)
+    private static function _calculateCccDigit(string $entidad, string $oficina, string $cuenta): string
     {
         // Dígito de control
         $dc = "";
-        $pesos = array(6, 3, 7, 9, 10, 5, 8, 4, 2, 1);
+        $weights = [6, 3, 7, 9, 10, 5, 8, 4, 2, 1];
 
-        foreach (array($entidad . $oficina, $cuenta) as $cadena) {
-            $suma = 0;
+        foreach ([$entidad . $oficina, $cuenta] as $cadena) {
+            $sum = 0;
             for ($i = 0, $len = strlen($cadena); $i < $len; $i++) {
-                $suma += $pesos[$i] * substr($cadena, $len - $i - 1, 1);
+                $sum += $weights[$i] * intval(substr($cadena, $len - $i - 1, 1));
             }
-            $digito = 11 - $suma % 11;
+            $digito = 11 - $sum % 11;
             if ($digito == 11) {
                 $digito = 0;
             } elseif ($digito == 10) {
@@ -143,7 +146,7 @@ class Banks_N43
             'W' => '32',
             'X' => '33',
             'Y' => '34',
-            'Z' => '35'
+            'Z' => '35',
         ];
         $dividendo = $ccc . $pesos[substr($codigoPais, 0, 1)] . $pesos[substr($codigoPais, 1, 1)] . '00';
         $digitoControl = 98 - bcmod($dividendo, '97');
@@ -171,7 +174,7 @@ class Banks_N43
             'refererence_1' => ltrim(substr($line, 52, 12), '0'),
             'refererence_2' => trim(substr($line, 64, 16)),
             'raw' => $line,
-            'concepts' => []
+            'concepts' => [],
         ];
 
         $entry = new Banks_N43_Entry();
@@ -202,7 +205,7 @@ class Banks_N43
      */
     protected function _parse_record_24(string $line): Banks_N43_Entry
     {
-        $this->_currentEntry->currency_eq = Banks_Helper::currency_number2code(substr($line, 4, 3));
+        $this->_currentEntry->currency_eq = Banks_Helper::currency_number2code(intval(substr($line, 4, 3)));
         $this->_currentEntry->amount_eq = floatval(substr($line, 7, 12) . '.' . substr($line, 19, 2));
 
         return $this->_currentEntry;
@@ -278,21 +281,19 @@ class Banks_N43
 
     private static function _parse_date(string $date): int
     {
-        return DateTime::createFromFormat('ymd', $date)->setTime(0, 0, 0)->getTimestamp();
+        // Crear a las 12 del mediodía para evitar problemas con los desfases horarios
+        return DateTime::createFromFormat('ymd', $date)->setTime(12, 0, 0)->getTimestamp();
     }
 }
 
-class Banks_N43_Exception extends Exception
-{
-
-}
+class Banks_N43_Exception extends Exception {}
 
 /**
- * @property int $bank
- * @property int $office
- * @property int $account
- * @property int $number
- * @property string IBAN
+ * @property int|string $bank
+ * @property int|string $office
+ * @property int|string $account
+ * @property int|string $number
+ * @property string $IBAN
  * @property int $date_start
  * @property int $date_end
  * @property string $type
@@ -303,13 +304,11 @@ class Banks_N43_Exception extends Exception
  * @property string $owner_name
  * @property Banks_N43_Entry[] $entries
  */
-class Banks_N43_Account extends stdClass
-{
-}
+class Banks_N43_Account extends stdClass {}
 
 
 /**
- * @property int $office
+ * @property int|string $office
  * @property int $date     Fecha de la operación, en formato marca temporal UNIX
  * @property string $date_raw Fecha de la operación, en formato original
  * @property int $date_value
@@ -317,12 +316,10 @@ class Banks_N43_Account extends stdClass
  * @property string $concept_own
  * @property string $type     (debit or credit)
  * @property float $amount
- * @property int $document
+ * @property int|string $document
  * @property string $refererence_1
  * @property string $refererence_2
  * @property string $raw      Registro completo sin procesar
  * @property string[] $concepts
  */
-class Banks_N43_Entry extends stdClass
-{
-}
+class Banks_N43_Entry extends stdClass {}
