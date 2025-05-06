@@ -24,14 +24,14 @@ class Banks_N43
     /**
      * Representa un adeudo de tu cuenta
      */
-    public const TYPE_DEBIT = 'debit';
+    public const string TYPE_DEBIT = 'debit';
 
     /**
      * Representa un abono en tu cuenta
      */
-    public const TYPE_CREDIT = 'credit';
+    public const string TYPE_CREDIT = 'credit';
 
-    public const TYPE_UNKNOWN = 'unknown';
+    public const string TYPE_UNKNOWN = 'unknown';
 
     public function parse(string $content): void
     {
