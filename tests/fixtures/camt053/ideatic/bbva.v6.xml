@@ -1,0 +1,154 @@
+<Document xmlns='urn:iso:std:iso:20022:tech:xsd:camt.053.001.06'>
+    <BkToCstmrStmt>
+        <GrpHdr>
+            <MsgId>00000000-0000-0000-0000-000000000000</MsgId>
+            <CreDtTm>2026-09-29T11:36:33</CreDtTm>
+        </GrpHdr>
+        <Stmt>
+            <Id>ES0182002000000000000000000000000000XXXXXXXXX_1</Id>
+            <ElctrncSeqNb>1</ElctrncSeqNb>
+            <CreDtTm>2026-09-29T11:36:33</CreDtTm>
+            <FrToDt>
+                <FrDtTm>2026-07-01</FrDtTm>
+                <ToDtTm>2026-10-04</ToDtTm>
+            </FrToDt>
+            <Acct>
+                <Id>
+                    <Othr>
+                        <Id>ES9121000418450200051332</Id>
+                    </Othr>
+                </Id>
+                <Tp>
+                    <Prtry>1</Prtry>
+                </Tp>
+            </Acct>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>OPBD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="EUR">1.234,56</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <DtTm>2026-09-29T00:00:00</DtTm>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLBD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="EUR">987,97</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <DtTm>2026-07-01T00:00:00</DtTm>
+                </Dt>
+            </Bal>
+            <Ntry>
+                <Amt Ccy="EUR">-661,89</Amt>
+                <CdtDbtInd>UNCATEGORIZED</CdtDbtInd>
+                <Sts>SETTLED</Sts>
+                <BookgDt>
+                    <Dt>2026-09-28</Dt>
+                </BookgDt>
+                <ValDt>
+                    <Dt>2026-09-27</Dt>
+                </ValDt>
+                <AcctSvcrRef>260927000000000000000000000000000001</AcctSvcrRef>
+                <BkTxCd>
+                    <Prtry>
+                        <Cd>064</Cd>
+                        <Issr>BBVA</Issr>
+                    </Prtry>
+                </BkTxCd>
+                <NtryDtls>
+                    <Btch>
+                        <MsgId>-</MsgId>
+                        <NbOfTxs>1</NbOfTxs>
+                    </Btch>
+                    <TxDtls>
+                        <Refs>
+                            <InstrId>-</InstrId>
+                            <EndToEndId>-</EndToEndId>
+                        </Refs>
+                        <Amt Ccy="EUR">661.89</Amt>
+                        <CdtDbtInd>CRDT</CdtDbtInd>
+                        <RltdPties>
+                            <Dbtr>
+                                <Nm>ACME SL</Nm>
+                            </Dbtr>
+                            <Cdtr>
+                                <Nm>OTRA CUENTA</Nm>
+                                <CtctDtls>
+                                    <MobNb>-</MobNb>
+                                </CtctDtls>
+                            </Cdtr>
+                        </RltdPties>
+                        <RmtInf>
+                            <Ustrd>-</Ustrd>
+                        </RmtInf>
+                    </TxDtls>
+                </NtryDtls>
+                <AddtlNtryInf>TRASPASO A OTRA CUENTA</AddtlNtryInf>
+            </Ntry>
+            <Ntry>
+                <Amt Ccy="EUR">147,97</Amt>
+                <CdtDbtInd>UNCATEGORIZED</CdtDbtInd>
+                <Sts>SETTLED</Sts>
+                <BookgDt>
+                    <Dt>2026-08-14</Dt>
+                </BookgDt>
+                <ValDt>
+                    <Dt>2026-08-14</Dt>
+                </ValDt>
+                <AcctSvcrRef>260813000000000000000000000000000002</AcctSvcrRef>
+                <NtryDtls>
+                    <TxDtls>
+                        <Refs>
+                            <EndToEndId>FACTURA 2026-17</EndToEndId>
+                        </Refs>
+                        <Amt Ccy="EUR">147.97</Amt>
+                        <CdtDbtInd>CRDT</CdtDbtInd>
+                        <RltdPties>
+                            <Dbtr>
+                                <Nm>CLIENTE DE PRUEBA</Nm>
+                            </Dbtr>
+                            <Cdtr>
+                                <Nm>ACME SL</Nm>
+                            </Cdtr>
+                        </RltdPties>
+                        <RmtInf>
+                            <Ustrd>Factura 2026-17</Ustrd>
+                        </RmtInf>
+                    </TxDtls>
+                </NtryDtls>
+            </Ntry>
+            <Ntry>
+                <Amt Ccy="EUR">-2.369,06</Amt>
+                <CdtDbtInd>UNCATEGORIZED</CdtDbtInd>
+                <Sts>SETTLED</Sts>
+                <BookgDt>
+                    <Dt>2026-07-02</Dt>
+                </BookgDt>
+                <ValDt>
+                    <Dt>2026-07-02</Dt>
+                </ValDt>
+                <AcctSvcrRef>260701000000000000000000000000000003</AcctSvcrRef>
+                <NtryDtls>
+                    <TxDtls>
+                        <Refs>
+                            <EndToEndId>-</EndToEndId>
+                        </Refs>
+                        <RltdPties>
+                            <Cdtr>
+                                <Nm>-</Nm>
+                            </Cdtr>
+                        </RltdPties>
+                    </TxDtls>
+                </NtryDtls>
+            </Ntry>
+        </Stmt>
+    </BkToCstmrStmt>
+</Document>
