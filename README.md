@@ -23,3 +23,11 @@ foreach ($file->accounts as $account) {
     }
 }
 ```
+
+## Desarrollo
+
+```
+composer install
+composer test
+composer phpstan
+```

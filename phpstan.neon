@@ -1,7 +1,11 @@
+includes:
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
 parameters:
-  level: 6
+  level: max
   paths:
-      - ./
+      - Banks
+      - tests
   parallel:
     processTimeout: 300.0
   reportUnmatchedIgnoredErrors: false
